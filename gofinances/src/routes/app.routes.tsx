@@ -4,12 +4,19 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { useTheme } from 'styled-components'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
-const { Navigator, Screen} = createBottomTabNavigator()
+const { Navigator, Screen} = createBottomTabNavigator<AppRoutesParamList>()
 
 import { Dashboard } from '../screens/Dashboard'
 import { Register } from '../screens/Register'
 
 import { RFValue } from 'react-native-responsive-fontsize'
+import { Resume } from '../screens/Resume'
+
+export type AppRoutesParamList = {
+    Listagem: undefined;
+    Cadastrar: undefined;
+    Resumo: undefined;
+};
 
 export function AppRoutes(){
     const theme = useTheme()
@@ -28,7 +35,7 @@ export function AppRoutes(){
             }}
         >
             <Screen 
-                name="Listagem"
+                name='Listagem'
                 component={Dashboard}
                 options={{
                     tabBarIcon: (({ size, color }) => 
@@ -42,7 +49,7 @@ export function AppRoutes(){
             />
 
             <Screen 
-                name="Casatrar"
+                name='Cadastrar'
                 component={Register}
                 options={{
                     tabBarIcon: (({ size, color }) => 
@@ -56,8 +63,8 @@ export function AppRoutes(){
             />
 
             <Screen 
-                name="Resumo"
-                component={Register}
+                name='Resumo'
+                component={Resume}
                 options={{
                     tabBarIcon: (({ size, color }) => 
                         <MaterialIcons 
