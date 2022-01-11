@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { ActivityIndicator } from 'react-native'
+import { ActivityIndicator, Alert } from 'react-native'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useFocusEffect } from '@react-navigation/native'
@@ -49,7 +49,8 @@ export function Dashboard(){
     const [highlightData, setHighlightData] = useState<HighlightData>({} as HighlightData);
 
     const theme = useTheme();
-
+    const dataKey = '@gofinances:transactions';
+    
     function getLastTransactionDate(
         collection: DataListProps[],
         type: 'positive' | 'negative'){
@@ -62,6 +63,30 @@ export function Dashboard(){
         
         return `${lastTransaction.getDate()} de ${lastTransaction.toLocaleString('pr-BR', { month: 'long' })}`;
     }
+
+    async function handleRemoveCard(transactionId: string){
+        const response = await AsyncStorage.getItem(dataKey);
+        const storagedTransactions = response ? JSON.parse(response) : [];
+
+        const filteredTransactions = storagedTransactions
+        .filter( (transaction: DataListProps) => transaction.id !== transactionId);
+
+        setTransactions(filteredTransactions);
+        await AsyncStorage
+        .setItem(dataKey, JSON.stringify(filteredTransactions));
+
+        loadTransactions();
+    }
+
+    function alert(name: string, id: string){
+        Alert.alert(`Você deseja deletar ${String(name)}`,
+        "",
+        [
+          {text: 'Cancelar', },
+          {text: 'Deletar', onPress: () => handleRemoveCard(id) },
+        ],
+          {cancelable: false}
+    )}
 
     async function loadTransactions(){
         const dataKey = '@gofinances:transactions';
@@ -202,9 +227,11 @@ export function Dashboard(){
                         <TransactionsList 
                             data={transactions}
                             keyExtractor={item => item.id}
-                            renderItem={({ item }) => <TransactionCard  data={item} />}
+                            renderItem={({ item }) => <TransactionCard  
+                            onPress={ () => alert(item.name, item.id) }
+                            data={item} 
+                            />}
                         />
-
                     </Transactions>
                 </>
             }

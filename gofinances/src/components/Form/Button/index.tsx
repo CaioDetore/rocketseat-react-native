@@ -3,7 +3,6 @@ import { RectButtonProps } from 'react-native-gesture-handler';
 
 import {
 Container,
-GestureHandlerView,
 ButtonContainer,
 Title
 } from './styles';
@@ -20,13 +19,11 @@ export function Button({
 } : Props) {
     return (
         <Container>
-            <GestureHandlerView>
                 <ButtonContainer onPress={onPress} {...rest}>
                     <Title>
                         { title }
                     </Title>
                 </ButtonContainer>
-            </GestureHandlerView>
         </Container>
     );
 }

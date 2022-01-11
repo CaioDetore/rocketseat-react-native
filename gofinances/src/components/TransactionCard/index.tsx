@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { BorderlessButtonProps } from 'react-native-gesture-handler'
+
 import { categories } from '../../utils/categories'
 
 import { 
@@ -9,6 +11,8 @@ import {
     Footer,
     Category,
     Icon,
+    IconButton,
+    IconDelete,
     CategoryName,
     Date
 } from './styles'
@@ -21,11 +25,12 @@ export interface TransactionCardProps {
     date: string;
 }
 
-interface Props {
+interface Props extends BorderlessButtonProps {
     data: TransactionCardProps;
+    onPress: () => void;
 }
 
-export function TransactionCard({ data } : Props ){
+export function TransactionCard({ data, onPress, ...rest} : Props ){
     const category = categories.filter(
         item => item.key === data.category
     )[0];
@@ -51,6 +56,10 @@ export function TransactionCard({ data } : Props ){
                 <Date>
                     {data.date}
                 </Date>
+
+                <IconButton onPress={onPress} {...rest}>
+                    <IconDelete name={'x'}/>
+                </IconButton>
             </Footer>
         </Container>
     )

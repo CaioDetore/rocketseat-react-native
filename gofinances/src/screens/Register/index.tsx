@@ -51,6 +51,7 @@ const schema = Yup.object().shape({
             .number()
             .typeError('Informe um valor númerico')
             .positive('O valor não pode ser negativo')
+            .required('Insira o valor')
 })
 
 export function Register(){

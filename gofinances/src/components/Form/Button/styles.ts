@@ -3,14 +3,10 @@ import { RectButton } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
-export const Container = styled.View`
+export const Container = styled(GestureHandlerRootView)`
     align-items: center;
     border-radius: 5px;
     background-color: ${({ theme }) => theme.colors.secondary};
-`
-
-export const GestureHandlerView = styled(GestureHandlerRootView)`
-    width: 100%;
 `
 
 export const ButtonContainer = styled(RectButton)`
