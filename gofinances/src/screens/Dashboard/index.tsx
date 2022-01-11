@@ -27,6 +27,7 @@ import {
     LogoutButton,
     LoadContainer
 } from './styles'
+import { AlertDialog } from '../../components/Dialog'
 
 export interface DataListProps extends TransactionCardProps {
     id: string;
@@ -47,6 +48,10 @@ export function Dashboard(){
     const [isLoading, setIsLoading] = useState(true);
     const [transactions, setTransactions] = useState<DataListProps[]>([]);
     const [highlightData, setHighlightData] = useState<HighlightData>({} as HighlightData);
+    const [transictionId, setTransictionId] = useState('');
+    const [message, setMessage] = useState('');
+    const [visible, setVisible] = useState(false);
+
 
     const theme = useTheme();
     const dataKey = '@gofinances:transactions';
@@ -65,28 +70,36 @@ export function Dashboard(){
     }
 
     async function handleRemoveCard(transactionId: string){
-        const response = await AsyncStorage.getItem(dataKey);
-        const storagedTransactions = response ? JSON.parse(response) : [];
+        try {
+            const response = await AsyncStorage.getItem(dataKey);
+            const storagedTransactions = response ? JSON.parse(response) : [];
 
-        const filteredTransactions = storagedTransactions
-        .filter( (transaction: DataListProps) => transaction.id !== transactionId);
+            const filteredTransactions = storagedTransactions
+            .filter( (transaction: DataListProps) => transaction.id !== transactionId);
 
-        setTransactions(filteredTransactions);
-        await AsyncStorage
-        .setItem(dataKey, JSON.stringify(filteredTransactions));
+            setTransactions(filteredTransactions);
+            await AsyncStorage
+            .setItem(dataKey, JSON.stringify(filteredTransactions));
 
-        loadTransactions();
+            setVisible(false);
+            loadTransactions();
+            
+        } catch (error){
+            console.log(error)
+            Alert.alert("Não foi possível excluir a transição selecionada")
+        }
+        
     }
 
-    function alert(name: string, id: string){
-        Alert.alert(`Você deseja deletar ${String(name)}`,
-        "",
-        [
-          {text: 'Cancelar', },
-          {text: 'Deletar', onPress: () => handleRemoveCard(id) },
-        ],
-          {cancelable: false}
-    )}
+    // function alert(name: string, id: string){
+    //     Alert.alert(`Você deseja deletar ${String(name)}`,
+    //     "",
+    //     [
+    //       {text: 'Cancelar', },
+    //       {text: 'Deletar', onPress: () => handleRemoveCard(id) },
+    //     ],
+    //       {cancelable: false}
+    // )}
 
     async function loadTransactions(){
         const dataKey = '@gofinances:transactions';
@@ -169,7 +182,16 @@ export function Dashboard(){
     useFocusEffect(useCallback(() => {
         loadTransactions();
     }, []));
-    
+
+    function showDialog(name: string, id: string){
+        setTransictionId(id)
+        setMessage('Deseja excluir a tansação: ' + name)
+        setVisible(true)
+    }
+
+    const handleCancel = () => {
+        setVisible(false);
+    };
 
     return(
         <Container>
@@ -227,10 +249,20 @@ export function Dashboard(){
                         <TransactionsList 
                             data={transactions}
                             keyExtractor={item => item.id}
-                            renderItem={({ item }) => <TransactionCard  
-                            onPress={ () => alert(item.name, item.id) }
-                            data={item} 
-                            />}
+                            renderItem={({item }) => 
+                                <TransactionCard  
+                                    onPress={ () => showDialog(item.name, item.id) }
+                                    data={item} 
+                                />
+                            }
+                        />
+                        
+                        <AlertDialog 
+                                    visible={visible}
+                                    title='Excluir'
+                                    message={ message }
+                                    confirm={ () => handleRemoveCard(transictionId) }
+                                    cancel={ () => handleCancel() } 
                         />
                     </Transactions>
                 </>

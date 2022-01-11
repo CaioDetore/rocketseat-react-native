@@ -3,7 +3,8 @@ import {
     Keyboard,
     Modal,
     TouchableWithoutFeedback,
-    Alert
+    Alert,
+    Platform
 } from 'react-native'
 
 import * as Yup from 'yup'
@@ -23,6 +24,8 @@ import { TransactionTypeButton } from '../../components/Form/TransactionTypeButt
 import { CategorySelectButton } from '../../components/Form/CategorySelectButton'
 
 import { CategorySelect } from '../CategorySelect'
+
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { 
     Container ,
@@ -62,6 +65,18 @@ export function Register(){
         key: 'category',
         name: 'Categoria',
     });
+
+    //data (não finalizado)
+    // const [date, setDate] = useState(new Date());
+    // const [show, setShow] = useState(true);
+
+    // const onChange = (event: Event, selectedDate: Date) => {
+    //     const currentDate = selectedDate || date;
+    //     setShow(Platform.OS === 'ios');
+    //     setDate(currentDate);
+    //     console.log(currentDate);
+    // };
+    //fim
 
     const navigation = useNavigation<RegisterNavigationProps>();
 
@@ -155,7 +170,18 @@ export function Register(){
                             keyboardType="numeric"
                             error={errors.amount && errors.amount.message}
                         />
-                        
+
+                        {/* {show && (
+                            <DateTimePicker
+                                testID="dateTimePicker"
+                                value={date}
+                                mode='date'
+                                is24Hour={true}
+                                display="default"
+                                // onChange={onChange}
+                            />
+                        )} */}
+
                         <TransactionTypes>
                             <TransactionTypeButton 
                                 type="up"
