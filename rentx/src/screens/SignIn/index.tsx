@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native'
 import { 
     StatusBar,
@@ -10,10 +10,13 @@ import {
 
 import * as Yup from 'yup';
 import theme from '../../styles/theme';
+import { useAuth } from '../../hook/auth';
+
 import { Input } from '../../components/Input'; 
 import { Button } from '../../components/Button';
 import { PasswordInput } from '../../components/PasswordInput';
 
+import { database } from '../../database';
 
 import {
     Container,
@@ -29,6 +32,7 @@ export function SignIn(){
     const [password, setPassword] = useState('');
 
     const navigation = useNavigation<any>();
+    const { signIn } = useAuth();
 
     async function handleSignIn() {
         try {
@@ -37,12 +41,12 @@ export function SignIn(){
                     .required('E-mail obrigatório')
                     .email('Digite um e-mail válido'),
                 password: Yup.string()
-                .required('A senha é obrigatória')
+                    .required('A senha é obrigatória')
             });
     
             await schema.validate({ email, password })
-            Alert.alert('Tudo certo!');
 
+            signIn({email, password})
         } catch(error){
             if(error instanceof Yup.ValidationError){
                 Alert.alert('Opa!', error.message);
@@ -57,6 +61,16 @@ export function SignIn(){
     function handleNewAccount() {
         navigation.navigate('SignUpFirstStep')
     }
+
+    useEffect(() => {
+        async function loadData() {
+            const userCollection = database.get('users');
+            const users = await userCollection.query().fetch();
+            console.log(users)
+        }
+
+        loadData();
+    },[])
 
     return (
         <KeyboardAvoidingView behavior="position" enabled>
@@ -84,7 +98,7 @@ export function SignIn(){
                             keyboardType="email-address"
                             autoCorrect={false}
                             autoCapitalize="none"
-                            onChangeText={setEmail}
+                            onChangeText={(text: string) => setEmail(text.trim())}
                             value={email}
                         />
 

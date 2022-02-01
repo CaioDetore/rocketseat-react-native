@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar, StyleSheet, BackHandler } from 'react-native'
+import { Alert, StatusBar, StyleSheet } from 'react-native'
 import { useTheme } from 'styled-components';
 import { useNavigation } from '@react-navigation/native';
-import { RFValue } from 'react-native-responsive-fontsize'
+import { RFValue } from 'react-native-responsive-fontsize';
+import NetInfo from '@react-native-community/netinfo';
+import { useNetInfo } from '@react-native-community/netinfo';
 
 import Animated, {
    useSharedValue,
@@ -37,6 +39,11 @@ export function Home(){
 
    const positionY = useSharedValue(0);
    const positionX = useSharedValue(0);
+   
+   const netInfo = useNetInfo();
+
+   const navigation = useNavigation<any>();
+   const theme = useTheme();
 
    const myCarsButtonStyle = useAnimatedStyle(() => {
       return {
@@ -62,8 +69,6 @@ export function Home(){
       }
    })
 
-   const navigation = useNavigation<any>();
-   const theme = useTheme();
 
    function handleCarDetails(car: CarDTO) {
       navigation.navigate('CarDetails', { car })
@@ -74,25 +79,36 @@ export function Home(){
    }
 
    useEffect(() => {
+      let isMounted = true;
+
       async function fetchCars() {
          try {
             const response = await api.get('/cars');
-            setCars(response.data);
+            if(isMounted){
+               setCars(response.data);
+            }
          } catch (error) {
             console.log(error);
          } finally {
-            setLoading(false);
+            if(isMounted){
+               setLoading(false);
+            }
          }
       }
 
       fetchCars();
+      return () => {
+         isMounted = false;
+      }
    },[]);
 
    useEffect(() => {
-      BackHandler.addEventListener('hardwareBackPress', () => {
-         return true;
-      })
-   }, [])
+      if (netInfo.isConnected){
+         Alert.alert('Você está On-line')
+      } else {
+         Alert.alert('Você está Off-line')
+      }
+   }, [netInfo.isConnected])
 
    return (
       <Container>
@@ -137,7 +153,7 @@ export function Home(){
                ]}
             >
                <ButtonAnimated 
-                  onPress={handleOpenMyCars}
+                  onPress={() => handleOpenMyCars}
                   style={[styles.button, {backgroundColor: theme.colors.main}]}
                >
                   <Ionicons 
