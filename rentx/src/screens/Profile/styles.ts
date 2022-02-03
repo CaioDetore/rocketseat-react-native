@@ -27,7 +27,7 @@ export const HeaderTop = styled.View`
     justify-content: space-between;
     align-items: center;
 
-    margin-top: ${getStatusBarHeight() + 32}px;
+    margin-top: ${getStatusBarHeight() + 20}px;
 `;
 
 export const HeaderTitle = styled.Text`
@@ -68,7 +68,7 @@ export const PhotoButton = styled(RectButton)`
 `
 export const Content = styled.View`
     padding: 0 ${RFValue(24)}px; 
-    margin-top: 122px;
+    margin-top: 100px;
 `;
 
 export const Options = styled.View`

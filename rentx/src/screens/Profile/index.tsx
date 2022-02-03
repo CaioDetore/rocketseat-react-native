@@ -11,6 +11,7 @@ import * as Yup from 'yup'
 import { useAuth } from '../../hook/auth'
 import { useTheme } from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
+import { useNetInfo } from '@react-native-community/netinfo';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 import { Feather } from '@expo/vector-icons';
@@ -20,6 +21,7 @@ import { PasswordInput } from '../../components/PasswordInput';
 import { BackButton } from '../../components/BackButton';
 import { Button } from '../../components/Button';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { ScrollView } from 'react-native-gesture-handler';
 
 import {
     Container,
@@ -36,10 +38,10 @@ import {
     OptionTitle,
     Section
 } from './styles';
-import { ScrollView } from 'react-native-gesture-handler';
 
 export function Profile(){
     const { user, signOut, updatedUser } = useAuth();
+    const netInfo = useNetInfo();
 
     const [option, setOption] = useState<'dataEdit' | 'passwordEdit'>('dataEdit');
     const [avatar, setAvatar] = useState(user.avatar);
@@ -54,7 +56,11 @@ export function Profile(){
     }
 
     function handleOptionChange(optionSelected: 'dataEdit' | 'passwordEdit') {
-        setOption(optionSelected);
+        if(netInfo.isConnected === false && optionSelected === 'passwordEdit'){
+            Alert.alert('Sem conexão com internet', 'Para mudar a senha, conecte-se a Internet');
+        } else {
+            setOption(optionSelected);
+        }
     }
 
     async function handleAvatarSelect(){
@@ -124,10 +130,10 @@ export function Profile(){
     }
 
     return (
+        <ScrollView>
         <KeyboardAvoidingView behavior="position" enabled>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <Container>
-                <ScrollView>
                     <Header>
                         <HeaderTop>
                             <BackButton color={theme.colors.shape} onPress={handleBack}/>
@@ -162,11 +168,11 @@ export function Profile(){
                                     Dados
                                 </OptionTitle>
                             </Option>
-                            <Option active={option === 'passwordEdit'}>
-                                <OptionTitle 
-                                    active={option === 'passwordEdit'}
-                                    onPress={() => handleOptionChange('passwordEdit')}
-                                >
+                            <Option 
+                                active={option === 'passwordEdit'}
+                                onPress={() => handleOptionChange('passwordEdit')}
+                            >
+                                <OptionTitle active={option === 'passwordEdit'}>
                                     Trocar senha
                                 </OptionTitle>
                             </Option>
@@ -216,9 +222,9 @@ export function Profile(){
                         onPress={handleProfileUpdate}
                     />
                     </Content>
-                    </ScrollView>
                 </Container>
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
+        </ScrollView>
     );
 }
