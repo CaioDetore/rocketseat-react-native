@@ -18,7 +18,7 @@ interface SkillData {
 export function Home(){
   const [newSkill, setNewSkill] = useState('')
   const [mySkills, setMySkills] = useState<SkillData[]>([])
-  const [gretting, setGretting] = useState('')
+  const [greeting, setGretting] = useState('')
 
   function handleAddNewSkill(){
     const data = {
@@ -50,20 +50,24 @@ export function Home(){
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>Welcome, Caio.</Text>
-
-      <Text style={styles.greetings}>
-        { gretting }
+      <Text style={styles.title} testID='welcome'>
+        Welcome, Caio.
       </Text>
 
-      <TextInput 
+      <Text style={styles.greetings}>
+        { greeting }
+      </Text>
+
+      <TextInput
+        testID="input-new" 
         style={styles.input}
         placeholder="New skill"
         placeholderTextColor="#555"
         onChangeText={setNewSkill}
       />
 
-      <Button 
+      <Button
+        testID='button-add'
         onPress={handleAddNewSkill} 
         title='Add'
       />
@@ -72,9 +76,13 @@ export function Home(){
         My Skills
       </Text>
 
+      {
+        mySkills && 
       <FlatList 
+        testID="flat-list-skills"
         data={mySkills}
         keyExtractor={item => item.id}
+        keyboardShouldPersistTaps="never"
         renderItem={({ item }) => (
           <SkillCard 
             skill={item.name} 
@@ -82,6 +90,7 @@ export function Home(){
           />
         )}
       />
+      }
 
       {/* <ScrollView showsVerticalScrollIndicator={false}>
       {
@@ -112,7 +121,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
     padding: Platform.OS == 'ios' ? 15 : 10,
     fontSize: 18,
-    marginTop: 30,
+    marginTop: 10,
     borderRadius: 7
   },
   greetings: {

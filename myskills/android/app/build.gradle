@@ -78,7 +78,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
-    enableHermes: false,  // clean and rebuild if changing
+    enableHermes: true,  // clean and rebuild if changing
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -96,7 +96,7 @@ def enableSeparateBuildPerCPUArchitecture = false
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 
 /**
  * The preferred build flavor of JavaScriptCore.
@@ -136,6 +136,12 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        android {
+
+        // Add to Detox.
+        testBuildType System.getProperty('testBuildType', 'debug')
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+}
     }
     splits {
         abi {
@@ -152,6 +158,15 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+
+        release {
+            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
@@ -165,7 +180,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -207,6 +222,10 @@ dependencies {
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.flipper'
     }
+
+    // Add to Detox.
+    androidTestImplementation('com.wix:detox:+') { transitive = true }
+    androidTestImplementation 'junit:junit:4.12'
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
